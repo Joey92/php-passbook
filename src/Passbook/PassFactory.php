@@ -140,7 +140,7 @@ class PassFactory
      *
      * @param  Passbook\PassInterface $pass
      * @throws FileException          If an IO error occurred
-     * @return SplFileObject
+     * @return resource
      */
     public function package(PassInterface $pass)
     {
@@ -177,9 +177,14 @@ class PassFactory
         // Manifest.json
         $manifestJSONFile = $passDir . 'manifest.json';
         $manifest = array();
-        foreach (scandir($passDir) as $file) {
-            if ($file == '.' or $file == '..') continue;
-            $manifest[$file] = sha1_file($passDir . $file);
+
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($passDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($files as $name => $file) {
+            if ($file->isDir()) continue;
+            $manifest[$files->getSubPathName()] = sha1_file($passDir . $files->getSubPathName());
         }
         file_put_contents($manifestJSONFile, json_encode($manifest));
 
@@ -213,26 +218,32 @@ class PassFactory
         }
 
         // Zip pass
-        $zipFile = $outputPath . $pass->getSerialNumber() . self::PASS_EXTENSION;
+        $zipFile = tmpfile();
+        $tmpFileMeta = stream_get_meta_data($zipFile);
         $zip = new ZipArchive();
-        if (!$zip->open($zipFile, $this->isOverwrite() ? ZIPARCHIVE::OVERWRITE : ZipArchive::CREATE)) {
+        if (!$zip->open($tmpFileMeta['uri'], $this->isOverwrite() ? ZIPARCHIVE::OVERWRITE : ZipArchive::CREATE)) {
             throw new FileException("Couldn't open zip file.");
         }
-        if ($handle = opendir($passDir)) {
-            while (false !== ($entry = readdir($handle))) {
-                if ($entry == '.' or $entry == '..') continue;
-                $zip->addFile($passDir . $entry, $entry);
+
+        $objects = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($passDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($objects as $name => $file) {
+
+            if ($file->isDir()) {
+                $zip->addEmptyDir($objects->getSubPathName());
+            } else {
+                $zip->addFile($name, $objects->getSubPathName());
             }
-            closedir($handle);
-        } else {
-            throw new FileException("Error reading pass directory");
         }
+
         $zip->close();
 
         // Remove temporary pass directory
         $this->rrmdir($passDir);
 
-        return new SplFileObject($zipFile);
+        return $zipFile;
     }
 
     /**
