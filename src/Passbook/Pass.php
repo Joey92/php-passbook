@@ -190,6 +190,11 @@ class Pass implements PassInterface
     protected $locales;
 
     /**
+     * @var string
+     */
+    protected $groupingIdentifier;
+
+    /**
      * @param string $serialNumber
      * @param string $description
      */
@@ -232,7 +237,8 @@ class Pass implements PassInterface
             'organizationName',
             'expirationDate',
             'voided',
-            'appLaunchURL'
+            'appLaunchURL',
+            'groupingIdentifier'
         );
         foreach ($properties as $property) {
             $method = 'is'.ucfirst($property);
@@ -709,5 +715,24 @@ class Pass implements PassInterface
     {
         return $this->locales;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setGroupingIdentifier($identifier)
+    {
+        $this->groupingIdentifier = $identifier;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGroupingIdentifier()
+    {
+        return $this->groupingIdentifier;
+    }
+
 
 }

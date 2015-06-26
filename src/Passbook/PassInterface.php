@@ -241,4 +241,14 @@ interface PassInterface
      * {@inheritdoc}
      */
     public function getLocales();
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setGroupingIdentifier($identifier);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGroupingIdentifier();
 }
