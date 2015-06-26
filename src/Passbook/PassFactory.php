@@ -174,6 +174,32 @@ class PassFactory
             copy($image->getPathname(), $fileName);
         }
 
+        // Locale + Images
+        foreach ($pass->getLocales() as $locale) {
+            $localeFolder = $passDir . $locale->getLocale() . '.lproj';
+
+            if (!is_dir($localeFolder)) {
+                mkdir($localeFolder);
+            }
+
+            $langFile = $localeFolder . DIRECTORY_SEPARATOR . 'pass.strings';
+
+            $stringFile = fopen($langFile, "w");
+            foreach ($locale->getStrings() as $key => $value) {
+                fwrite($stringFile, sprintf("\"%s\"=\"%s\";\n", $key, $value));
+            }
+            fclose($stringFile);
+
+            foreach ($locale->getImages() as $image) {
+                $imgName = $localeFolder . $image->getContext();
+                if ($image->isRetina()) {
+                    $imgName .= '@2x';
+                }
+                $imgName .= '.'.$image->getExtension();
+                copy($image->getPathname(), $imgName);
+            }
+        }
+
         // Manifest.json
         $manifestJSONFile = $passDir . 'manifest.json';
         $manifest = array();

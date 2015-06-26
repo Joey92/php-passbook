@@ -236,4 +236,9 @@ interface PassInterface
      * {@inheritdoc}
      */
     public function getOrganizationName();
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLocales();
 }
