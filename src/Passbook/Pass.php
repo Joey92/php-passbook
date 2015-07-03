@@ -380,7 +380,7 @@ class Pass implements PassInterface
      */
     public function addAssociatedStoreIdentifier($associatedStoreIdentifier)
     {
-        $this->associatedStoreIdentifiers[] = $associatedStoreIdentifier;
+        $this->associatedStoreIdentifiers[] = (int)$associatedStoreIdentifier;
 
         return $this;
     }
