@@ -238,7 +238,8 @@ class Pass implements PassInterface
             'expirationDate',
             'voided',
             'appLaunchURL',
-            'groupingIdentifier'
+            'groupingIdentifier',
+            'associatedStoreIdentifiers'
         );
         foreach ($properties as $property) {
             $method = 'is'.ucfirst($property);
@@ -258,7 +259,7 @@ class Pass implements PassInterface
             } elseif (is_array($val)) {
                 // Array
                 foreach ($val as $v) {
-                    $array[$property][] = $v->toArray();
+                    $array[$property][] = $v;
                 }
             }
         }
