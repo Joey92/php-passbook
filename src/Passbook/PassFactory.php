@@ -50,12 +50,6 @@ class PassFactory
     protected $teamIdentifier;
 
     /**
-     * Organization name
-     * @var string
-     */
-    protected $organizationName;
-
-    /**
      * P12 file
      * @var Passbook\Certificate\P12
      */
@@ -73,12 +67,11 @@ class PassFactory
      */
     const PASS_EXTENSION = '.pkpass';
 
-    public function __construct($passTypeIdentifier, $teamIdentifier, $organizationName, $p12File, $p12Pass, $wwdrFile)
+    public function __construct($passTypeIdentifier, $teamIdentifier, $p12File, $p12Pass, $wwdrFile)
     {
         // Required pass information
         $this->passTypeIdentifier = $passTypeIdentifier;
         $this->teamIdentifier     = $teamIdentifier;
-        $this->organizationName   = $organizationName;
         // Create certificate objects
         $this->p12  = new P12($p12File, $p12Pass);
         $this->wwdr = new WWDR($wwdrFile);
@@ -146,7 +139,6 @@ class PassFactory
     {
         $pass->setPassTypeIdentifier($this->passTypeIdentifier);
         $pass->setTeamIdentifier($this->teamIdentifier);
-        $pass->setOrganizationName($this->organizationName);
 
         // Serialize pass
         $json = self::serialize($pass);
